@@ -6,16 +6,21 @@ function preload(){
   "/Hot Air Ballon-04.png");
   
   backgroundImage = loadImage("/Hot Air Ballon-01.png");
-  var ballonPosition=database.ref('balloon/height');
-  ballonPosition.on("value", readPosition, showError);
 
 }
 
 
 function setup() {
-  createCanvas(500,500);
+  createCanvas(1500,800);
+
   database = firebase.database();
   console.log(database);
+  
+  ballon=createSprite(250, 650, 150, 150);
+  ballon.addAnimation("Hotairballoon", balloonImage);
+  var ballonPosition=database.ref('balloon/position');
+  ballonPosition.on("value", readHeight, showError);
+
 
 }
 
@@ -24,37 +29,38 @@ function draw() {
 
 
   if(keyDown(LEFT_ARROW)){
-     balloon.x = balloon.x-10;
+    updateHeight(-10,0);
+    ballon.addAnimation("Hotairballoon", balloonImage);
   } else if(keyDown(RIGHT_ARROW)){
-    balloon.x = balloon.x+10;
+    updateHeight(10,0);
+    ballon.addAnimation("Hotairballoon", balloonImage);
   } else if(keyDown(UP_ARROW)){
-    balloon.y = balloon.y-10;
-  } else if(keyDown(DOWN_ARROW)){
-    balloon.y = balloon.y+10;
-  }
-
-  if(keyDown(UP_ARROW)){
     updateHeight(0,-10);
-    balloon.addAnimation("hotAirBalloon", balloonImage);
-    balloon.scale=balloon.scale- 0.01;
+    ballon.addAnimation("Hotairballoon", balloonImage);
+    balloon.scale=balloon.scale- 0.005;
+  } else if(keyDown(DOWN_ARROW)){
+    updateHeight(0,10);
+    ballon.addAnimation("Hotairballoon", balloonImage);
+    balloon.scale=balloon.scale+ 0.005;
   }
-  
-  
-  animation(balloonImage, 200, 200);
+ drawSprites();
+
+   textSize(20);
+   text("Use arrows to move the hot air balloon", 40, 40);
   
 }
 
 function updateHeight(x,y){
   database.ref('balloon/height').set({
-      'x':position.x+x,
-      'y':position.y+y
+      'x':height.x+x,
+      'y':height.y+y
   }) 
 }
 
-function readPosition(data){
-  position = data.val();  
-  balloon.x = position.x;
-  balloon.y = position.y;
+function readHeight(data){
+  height = data.val();  
+  balloon.x = height.x;
+  balloon.y = height.y;
 }
 
 function showError(){
